@@ -9,8 +9,6 @@ When you run the up there will be a text field where you put your API and then y
 
 If the API key is invalid you will be informed about it. When the API key is valid it will be saved to setting.json and auto-inserted in to the field next time. You will be still required to press the button.
 
----
-
 ## Number of API calls
 Right now the app updates every 30 seconds making 3 API calls.
 
