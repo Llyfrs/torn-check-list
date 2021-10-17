@@ -135,9 +135,9 @@ def update_tasks():
     time_day_start = int(timestamp - time_from_midnight)
 
 
-    info = get_request("https://api.torn.com/user/?selections=cooldowns,profile,refills,networth,bars,icons&key={0}".format(API_key))
-    count_logs = str(get_request("https://api.torn.com/user/?selections=log&log=4200,5360,7815,7810,7805,8370&from={0}&key={1}".format(time_day_start,API_key)))
-    NPC_shop = get_request("https://api.torn.com/user/?selections=log&log=4200&from={}&key={}".format(time_day_start,API_key))
+    info = get_request(f'https://api.torn.com/user/?selections=cooldowns,profile,refills,networth,bars,icons&key={API_key}')
+    count_logs = str(get_request(f'https://api.torn.com/user/?selections=log&log=4200,5360,7815,7810,7805,8370&from={time_day_start}&key={API_key}'))
+    NPC_shop = get_request(f'https://api.torn.com/user/?selections=log&log=4200&from={time_day_start}&key={API_key}')
 
 
     #Drug cooldown task
@@ -195,10 +195,8 @@ def update_tasks():
     
     #Bust people task
     busts= count_logs.count("g\': 5360") 
-    if   busts < 2:
-        tasks.append(Task("Bust {} people out of jail".format(3-busts),7,ID=7,image="icons/busts.png"))
-    elif busts == 2:
-        tasks.append(Task("Bust 1 person out of jail",7,ID=7,image="icons/busts.png"))
+    if   busts <= 2:
+        tasks.append(Task("Do {} more busts".format(3-busts),7,ID=7,image="icons/busts.png"))
         pass
     
     
