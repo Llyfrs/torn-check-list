@@ -168,7 +168,7 @@ def update_tasks():
     #Crime task
     nerve = info.get("nerve")
     if int(nerve.get("current")) >= int(nerve.get("maximum")):
-        tasks.append(Task("Go Commint some Crimes",2,ID=3,image="icons/crimes.png"))
+        tasks.append(Task("Go Commit some Crimes",2,ID=3,image="icons/crimes.png"))
 
     #Unpaidfees task
     unpaidfees = int(info.get("networth").get("unpaidfees"))
