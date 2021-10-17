@@ -1,5 +1,5 @@
 # Torn check list
-GUI application that is using your Torn City API to generate a list of task that you should perform.  
+GUI application that is using your [Torn City](https://www.torn.com/) API to generate a list of task that you should perform.  
 
 ![image](https://user-images.githubusercontent.com/59464917/137616451-2ab048af-c2de-426a-a9ac-85767e2fff9d.png)
 
