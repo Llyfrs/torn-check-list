@@ -13,6 +13,16 @@ If the API key is invalid you will be informed about it. When the API key is val
 ## Number of API calls
 Right now the app updates every 30 seconds making 3 API calls.
 
+# Installation 
+For running this python program you will need PyQt5 and request packages. You can install them manually using commands shown bellow.
+```
+pip install PyQt5
+pip install request
+```
+Or you can install them using provided pipfile using pipenv 
+```
+pipenv install
+```
 # List of all generated task. 
 
 - Reminder to take drugs 
