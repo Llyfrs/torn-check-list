@@ -19,7 +19,7 @@ class Ui_MainWindow(object):
         MainWindow.resize(364, 603)
         MainWindow.setMinimumSize(QtCore.QSize(364, 364))
         MainWindow.setMaximumSize(QtCore.QSize(364, 16777215))
-        MainWindow.setWindowOpacity(0.5)
+        MainWindow.setWindowOpacity(1)
         MainWindow.setTabShape(QtWidgets.QTabWidget.Triangular)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
