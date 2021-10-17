@@ -3,7 +3,27 @@ GUI application that is using your [Torn City](https://www.torn.com/2531272) API
 
 ![image](https://user-images.githubusercontent.com/59464917/137616451-2ab048af-c2de-426a-a9ac-85767e2fff9d.png)
 
+# Installation 
+
+This package uses [Pipenv](https://realpython.com/pipenv-guide/#example-usage) to manage dependencies. You first need to install Pipenv :
+
+```pip install --user pipenv```
+
+Then to install all dependencies, in the torn-check-list directory:
+
+```pipenv install --ignore-pipfile```
+
 # Usage
+
+Once the the dependencies are installed, you can run the program with :
+
+```pipenv run python .\torn-task-list.py``` (on Windows).
+
+Alternatively you can use, in the torn-check-list directory:
+
+```pipenv shell```
+
+then run ``torn-task-list.py`` as you would normally do (such as with ``python .\torn-task-list.py`` on Windows).
 
 The file to run is torn-task-list.py 
 
