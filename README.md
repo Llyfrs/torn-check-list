@@ -1,6 +1,8 @@
 # torn-check-list
 GUI application that is using your Torn City API to generate a list of task that you should perform.  
 
+![image](https://user-images.githubusercontent.com/59464917/137616372-115b5a4d-30ef-4a33-9256-83f77b49eb47.png)
+
 # Usage
 
 When you run the up there will be a text field where you put your API and then you just press the only button that exists there. This will automatically generate task that you are yet to complete.
