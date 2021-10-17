@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.pushButton.clicked.connect(the_button_was_clicked)
         #self.newbutton = QtWidgets.QPushButton(self.centralwidget) 
         self.timer= QtCore.QTimer()
-        self.timer.timeout.connect(update_tick)
+        self.timer.timeout.connect(update_tasks)
         self.frame.hide()
         self.error.hide()
         
@@ -83,21 +83,6 @@ def the_button_was_clicked():
     window.error.hide()
     update_tasks()
 
-def update_tick():
-    update_tasks()
-
-
-
-app = QtWidgets.QApplication(sys.argv) # not sure what it does 
-window = MainWindow() #initializing window.py basically 
-window.show() 
-
-
-with open("setting.json") as json_data: # Loads setting from setting file 
-    setting = json.load(json_data)
-
-if setting.get("API_key") != None : # inserst key in to field if it exists. 
-    window.textEdit.setText(setting.get("API_key"))
 
 
 tasks = list()
@@ -234,7 +219,19 @@ def update_tasks():
 
     reorder_task()
     
-    
+
+
+app = QtWidgets.QApplication(sys.argv) # not sure what it does 
+window = MainWindow() #initializing window.py basically 
+window.show() 
+
+with open("setting.json") as json_data: # Loads setting from setting file 
+    setting = json.load(json_data)
+
+if setting.get("API_key") != None : # inserst key in to field if it exists. 
+    window.textEdit.setText(setting.get("API_key"))
+
+
 app.exec()
 
 
