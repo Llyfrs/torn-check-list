@@ -5,7 +5,9 @@ GUI application that is using your [Torn City](https://www.torn.com/2531272) API
 
 # Usage
 
-When you run the up there will be a text field where you put your API and then you just press the only button that exists there. This will automatically generate task that you are yet to complete.
+The file to run is torn-task-list.py 
+
+When you run the app there will be a text field where you put your API and then you just press the only button that exists there. This will automatically generate task that you are yet to complete.
 If the API key is invalid you will be informed about it. When the API key is valid it will be saved to setting.json and auto-inserted in to the field next time. You will be still required to press the button.
 
 ## Number of API calls
