@@ -158,7 +158,7 @@ def update_tasks():
     #Energy refill task
     refills = info.get("refills")
     if not bool(refills.get("energy_refill_used")):
-        tasks.append(Task("Use Your Energy Refill",4,ID=2,image="icons/e_refill.png"))
+        tasks.append(Task("Use Your Energy Refill",4,link=link("https://www.torn.com/crimes.php"),ID=2,image="icons/e_refill.png"))
 
     #Energy task
     energy = info.get("energy")
@@ -168,7 +168,7 @@ def update_tasks():
     #Crime task
     nerve = info.get("nerve")
     if int(nerve.get("current")) >= int(nerve.get("maximum")):
-        tasks.append(Task("Go Commit some Crimes",2,ID=3,image="icons/crimes.png"))
+        tasks.append(Task("Go Commit some Crimes",2,link=link("https://www.torn.com/crimes.php"),ID=3,image="icons/crimes.png"))
 
     #Unpaidfees task
     unpaidfees = int(info.get("networth").get("unpaidfees"))
@@ -178,7 +178,7 @@ def update_tasks():
     #Racing task 
     race = info.get("icons").get("icon17")
     if race == None:
-        tasks.append(Task("You should enter race",5,ID=8,image="icons/race.png"))
+        tasks.append(Task("You should enter race",5,link=("https://www.torn.com/loader.php?sid=racing"),ID=8,image="icons/race.png"))
 
     #Rehab task
     addiction = info.get("icons").get("icon57")
@@ -196,7 +196,7 @@ def update_tasks():
     #Bust people task
     busts= count_logs.count("g\': 5360") 
     if   busts <= 2:
-        tasks.append(Task("Do {} more busts".format(3-busts),7,ID=7,image="icons/busts.png"))
+        tasks.append(Task("Do {} more busts".format(3-busts),7,link=link("https://www.torn.com/jailview.php"),ID=7,image="icons/busts.png"))
         pass
     
     
@@ -212,7 +212,7 @@ def update_tasks():
         for log in NPC_shop:
             brought += int(NPC_shop.get(log).get("data").get("quantity"))
     if brought < 100 :
-        tasks.append(Task("Buy {} items at NPC shop".format(100-brought),9,ID=8,image="icons/bits_bobs.png"))
+        tasks.append(Task("Buy {} items at NPC shop".format(100-brought),9,link=link("https://www.torn.com/shops.php?step=bitsnbobs"),ID=8,image="icons/bits_bobs.png"))
 
 
     reorder_task()
