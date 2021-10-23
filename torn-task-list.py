@@ -11,7 +11,7 @@ from PyQt5 import QtWidgets, uic
 from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon, QPixmap
 
-
+from setting_window import Ui_Dialog
 from window import Ui_MainWindow
 
 API_key = None
@@ -20,6 +20,60 @@ API_key = None
 settings = QtCore.QSettings("setting.ini",QtCore.QSettings.IniFormat) 
 
 
+#Setting window contains setting for the program
+#Here you can chose what tasks will be shown and more. 
+class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.buttonBox.accepted.connect(self.save)
+
+        #Quick fix so None variables don't load, not yet sure how to implement better. 
+        #This leads to a bug where when you delete one line from your settin it will reset it.
+        #Hope user wont really do that but I would still like it to be working better. 
+        if len(settings.allKeys()) == 15: 
+            #Displayed Tasks setting 
+            self.bills.setChecked(bool(settings.value("bills")))
+            self.booster.setChecked(bool(settings.value("booster")))
+            self.busts.setChecked(bool(settings.value("busts")))
+            self.drug.setChecked(bool(settings.value("drug")))
+            self.energy.setChecked(bool(settings.value("energy")))
+            self.energy_refill.setChecked(bool(settings.value("energy_refill")))
+            self.medical.setChecked(bool(settings.value("medical")))
+            self.missions.setChecked(bool(settings.value("missions")))
+            self.nerve.setChecked(bool(settings.value("nerve")))
+            self.npc.setChecked(bool(settings.value("npc")))
+            self.race.setChecked(bool(settings.value("race")))
+            self.rehab.setChecked(bool(settings.value("rehab")))
+            self.wheels.setChecked(bool(settings.value("wheels")))
+            
+            #Advanced Options
+
+            self.busts_number.setValue(int(settings.value("busts_number")))
+        
+        
+
+    def save(self): #Saves check box states in to a setting.ini 
+        #Displayed Tasks setting 
+        settings.setValue("bills", int(self.bills.isChecked()))
+        settings.setValue("booster", int(self.booster.isChecked()))
+        settings.setValue("busts", int(self.busts.isChecked()))
+        settings.setValue("drug", int(self.drug.isChecked()))
+        settings.setValue("energy", int(self.energy.isChecked()))
+        settings.setValue("energy_refill", int(self.energy_refill.isChecked()))
+        settings.setValue("medical", int(self.medical.isChecked()))
+        settings.setValue("missions", int(self.missions.isChecked()))
+        settings.setValue("nerve", int(self.nerve.isChecked()))
+        settings.setValue("npc", int(self.npc.isChecked()))
+        settings.setValue("race", int(self.race.isChecked()))
+        settings.setValue("rehab", int(self.rehab.isChecked()))
+        settings.setValue("wheels", int(self.wheels.isChecked()))
+        #Advanced Options
+        settings.setValue("busts_number", self.busts_number.value())
+        
+
+        update_tasks()
+        
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -27,14 +81,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         
-        #self.pushButton.setCheckable(True)
+
         self.pushButton.clicked.connect(the_button_was_clicked)
-        #self.newbutton = QtWidgets.QPushButton(self.centralwidget) 
+        self.actionSetting.triggered.connect(self.open_setting)
         self.timer= QtCore.QTimer()
         self.timer.timeout.connect(update_tasks)
         self.frame.hide()
         self.error.hide()
-        
+
+    def open_setting(self):
+        self.dialog = SettingWindow(self)
+        self.dialog.open()
+
 
 class Task():
     
@@ -85,7 +143,6 @@ def the_button_was_clicked():
     window.timer.start(30500) #every 30 second update (new data is shown every 30 seconds so no need to update sooner)
     window.error.hide()
     update_tasks()
-
 
 
 tasks = list()
@@ -144,48 +201,48 @@ def update_tasks():
 
 
     #Drug cooldown task
-    if int(info.get("cooldowns").get("drug")) < 60:
+    if int(info.get("cooldowns").get("drug")) < 60 and bool(settings.value("drug")):
         tasks.append(Task("Take a drug!",1,ID=1,image=("icons/drugs.png"))) 
 
     #Medical cooldown task
     medical = int(info.get("cooldowns").get("medical"))
     life = (float(info.get("life").get("current"))/float(info.get("life").get("maximum")))*100
-    if medical < 14400 and life > 90: #set up that you get task only if you can fill 3 blood packs
+    if medical < 14400 and life > 90 and bool(settings.value("medical")): #set up that you get task only if you can fill 3 blood packs
         tasks.append(Task("Fill a Blood Bag",5,ID=1,image=str("icons/medical.png")))
 
     #Bosster cooldown task
     booster = int(info.get("cooldowns").get("booster"))
-    if booster < 28800:
+    if booster < 28800 and bool(settings.value("booster")):
         tasks.append(Task("Go Drink some Beer",4,ID=1,image="icons/booster.png"))
     
     #Energy refill task
     refills = info.get("refills")
-    if not bool(refills.get("energy_refill_used")):
+    if not bool(refills.get("energy_refill_used")) and bool(settings.value("energy_refill")):
         tasks.append(Task("Use Your Energy Refill",4,link=link("https://www.torn.com/crimes.php"),ID=2,image="icons/e_refill.png"))
 
     #Energy task
     energy = info.get("energy")
-    if int(energy.get("current"))==int(energy.get("maximum")):
+    if int(energy.get("current"))==int(energy.get("maximum")) and bool(settings.value("energy")):
         tasks.append(Task("Spend your Energy on something",2,ID=3,image="icons/energy.png"))
 
     #Crime task
     nerve = info.get("nerve")
-    if int(nerve.get("current")) >= int(nerve.get("maximum")):
+    if int(nerve.get("current")) >= int(nerve.get("maximum")) and bool(settings.value("nerve")):
         tasks.append(Task("Go Commit some Crimes",2,link=link("https://www.torn.com/crimes.php"),ID=3,image="icons/crimes.png"))
 
     #Unpaidfees task
     unpaidfees = int(info.get("networth").get("unpaidfees"))
-    if unpaidfees != 0:
+    if unpaidfees != 0 and bool(settings.value("bills")):
         tasks.append(Task("You have -${:,} unpaidfees".format(-1*unpaidfees),6,link("https://www.torn.com/loan.php"),ID=5,image="icons/fees.png"))
 
     #Racing task 
     race = info.get("icons").get("icon17")
-    if race == None:
+    if race == None and bool(settings.value("race")):
         tasks.append(Task("You should enter race",5,link=link("https://www.torn.com/loader.php?sid=racing"),ID=8,image="icons/race.png"))
 
     #Rehab task
     addiction = info.get("icons").get("icon57")
-    if addiction != None:
+    if addiction != None and bool(settings.value("rehab")):
         addiction = str(addiction)[(addiction.find("(")+1):addiction.find(")")].strip("-%")
         if int(addiction) >= 3:
             tasks.append(Task("Go to rehab",6,ID=11))
@@ -193,19 +250,20 @@ def update_tasks():
 
     #Daily mission task
     missions = count_logs.count("g\': 7815") + count_logs.count("g\': 7810") + count_logs.count("g\': 7805")
-    if missions == 0:
+    if missions == 0 and bool(settings.value("missions")):
         tasks.append(Task("Complete your daily mission",9,ID=6,image="icons/mission.png"))
     
     #Bust people task
-    busts= count_logs.count("g\': 5360") 
-    if   busts <= 2:
-        tasks.append(Task("Do {} more busts".format(3-busts),7,link=link("https://www.torn.com/jailview.php"),ID=7,image="icons/busts.png"))
+    busts = count_logs.count("g\': 5360") 
+    busts_number = int(settings.value("busts_number"))
+    if   busts < busts_number  and bool(settings.value("busts")):
+        tasks.append(Task("Do {} more busts".format(busts_number-busts),7,link=link("https://www.torn.com/jailview.php"),ID=7,image="icons/busts.png"))
         pass
     
     
     #Wheel of Fortune
     spins = count_logs.count("g\': 8370")
-    if spins != 3:
+    if spins != 3 and bool(settings.value("wheels")):
         tasks.append(Task("You have {} wheels to be spun".format(3-spins),8,link=link("https://www.torn.com/loader.php?sid=spinTheWheel"),ID=10,image="icons/wheel.png"))
 
     #Buy stuff at NPC shop task
@@ -214,7 +272,7 @@ def update_tasks():
     if NPC_shop != None:
         for log in NPC_shop:
             brought += int(NPC_shop.get(log).get("data").get("quantity"))
-    if brought < 100 :
+    if brought < 100 and bool(settings.value("npc")):
         tasks.append(Task("Buy {} items at NPC shop".format(100-brought),9,link=link("https://www.torn.com/shops.php?step=bitsnbobs"),ID=8,image="icons/bits_bobs.png"))
 
 
