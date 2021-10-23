@@ -52,5 +52,6 @@ Right now the app updates every 30 seconds making 3 API calls.
 ## Donwoald
 
 [torn-check-list-v1.1.0-linux.tar.xz](https://github.com/Llyfrs/torn-check-list/releases/download/v1.1.0/torn-check-list-v1.1.0-linux.tar.xz) 
+
 [torn-check-list-v1.1.0-windows.zip](https://github.com/Llyfrs/torn-check-list/releases/download/v1.1.0/torn-check-list-v1.1.0-windows.zip)
 
