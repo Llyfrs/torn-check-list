@@ -18,7 +18,6 @@ API_key = None
 #Forcing setting file back in to the application folder.
 #This will make sure that I don't leave any junk files over peoples computers. Since there is no unistall button. 
 settings = QtCore.QSettings("setting.ini",QtCore.QSettings.IniFormat) 
-print(settings.allKeys())
 
 #Setting window contains setting for the program
 #Here you can chose what tasks will be shown and more. 
@@ -27,29 +26,28 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         super().__init__(parent)
         self.setupUi(self)
         self.buttonBox.accepted.connect(self.save)
-        print(settings.value("bills"))
         #Quick fix so None variables don't load, not yet sure how to implement better. 
         #This leads to a bug where when you delete one line from your settin it will reset it.
         #Hope user wont really do that but I would still like it to be working better. 
-        #if len(settings.allKeys()) == 15: 
+        if len(settings.allKeys()) > 13: 
             #Displayed Tasks setting 
-        self.bills.setChecked(int(settings.value("bills")))
-        self.booster.setChecked(int(settings.value("booster")))
-        self.busts.setChecked(int(settings.value("busts")))
-        self.drug.setChecked(int(settings.value("drug")))
-        self.energy.setChecked(int(settings.value("energy")))
-        self.energy_refill.setChecked(int(settings.value("energy_refill")))
-        self.medical.setChecked(int(settings.value("medical")))
-        self.missions.setChecked(int(settings.value("missions")))
-        self.nerve.setChecked(int(settings.value("nerve")))
-        self.npc.setChecked(int(settings.value("npc")))
-        self.race.setChecked(int(settings.value("race")))
-        self.rehab.setChecked(int(settings.value("rehab")))
-        self.wheels.setChecked(int(settings.value("wheels")))
+            self.bills.setChecked(int(settings.value("bills")))
+            self.booster.setChecked(int(settings.value("booster")))
+            self.busts.setChecked(int(settings.value("busts")))
+            self.drug.setChecked(int(settings.value("drug")))
+            self.energy.setChecked(int(settings.value("energy")))
+            self.energy_refill.setChecked(int(settings.value("energy_refill")))
+            self.medical.setChecked(int(settings.value("medical")))
+            self.missions.setChecked(int(settings.value("missions")))
+            self.nerve.setChecked(int(settings.value("nerve")))
+            self.npc.setChecked(int(settings.value("npc")))
+            self.race.setChecked(int(settings.value("race")))
+            self.rehab.setChecked(int(settings.value("rehab")))
+            self.wheels.setChecked(int(settings.value("wheels")))
         
-        #Advanced Options
+            #Advanced Options
 
-        self.busts_number.setValue(int(settings.value("busts_number")))
+            self.busts_number.setValue(int(settings.value("busts_number")))
         
         
 
@@ -72,7 +70,7 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("busts_number", self.busts_number.value())
         
 
-        update_tasks()
+        the_button_was_clicked() #Running this function since it has all necessary checks.
         
 
 
@@ -89,9 +87,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.frame.hide()
         self.error.hide()
 
+
     def open_setting(self):
         self.dialog = SettingWindow(self)
         self.dialog.open()
+    def generate_save_file(self):
+        self.dialog = SettingWindow(self)
+        self.dialog.save()
+
 
 
 class Task():
@@ -156,7 +159,7 @@ def reorder_task(): # first actually working pice of code :D Sorts Task based on
                 task.move(offset)
                 offset += 1
 
-def get_request(url): #Code that waits and retryes request when error occurs (most comonly running out off AP calls) 
+def get_request(url): #Code that waits and retryes request when error occurs (most comonly running out off API calls) 
     json_info = requests.get(url).json()
     
     while True:
@@ -255,11 +258,12 @@ def update_tasks():
         tasks.append(Task("Complete your daily mission",9,ID=6,image="icons/mission.png"))
     
     #Bust people task
-    busts = count_logs.count("g\': 5360") 
-    busts_number = int(settings.value("busts_number"))
-    if   busts < busts_number  and bool(settings.value("busts")):
-        tasks.append(Task("Do {} more busts".format(busts_number-busts),7,link=link("https://www.torn.com/jailview.php"),ID=7,image="icons/busts.png"))
-        pass
+    if settings.value("busts_number")!= None: #Just in case value doesn't exists in setting. 
+        busts = count_logs.count("g\': 5360") 
+        busts_number = int(settings.value("busts_number"))
+        if   busts < busts_number  and bool(settings.value("busts")):
+            tasks.append(Task("Do {} more busts".format(busts_number-busts),7,link=link("https://www.torn.com/jailview.php"),ID=7,image="icons/busts.png"))
+            pass
     
     
     #Wheel of Fortune
@@ -284,6 +288,10 @@ def update_tasks():
 app = QtWidgets.QApplication(sys.argv) # not sure what it does 
 window = MainWindow() #initializing window.py basically 
 window.show() 
+
+
+if len(settings.allKeys()) == 0: #Checks if setting file exists if no forces window to generate new one. 
+    window.generate_save_file()
 
 
 if settings.value("API_key") != None : # inserst key in to field if it exists. 
