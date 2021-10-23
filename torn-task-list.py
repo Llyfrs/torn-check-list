@@ -15,8 +15,9 @@ from PyQt5.QtGui import QIcon, QPixmap
 from window import Ui_MainWindow
 
 API_key = None
-
-settings = QtCore.QSettings()
+#Forcing setting file back in to the application folder.
+#This will make sure that I don't leave any junk files over peoples computers. Since there is no unistall button. 
+settings = QtCore.QSettings("setting.ini",QtCore.QSettings.IniFormat) 
 
 
 
@@ -180,7 +181,7 @@ def update_tasks():
     #Racing task 
     race = info.get("icons").get("icon17")
     if race == None:
-        tasks.append(Task("You should enter race",5,link=("https://www.torn.com/loader.php?sid=racing"),ID=8,image="icons/race.png"))
+        tasks.append(Task("You should enter race",5,link=link("https://www.torn.com/loader.php?sid=racing"),ID=8,image="icons/race.png"))
 
     #Rehab task
     addiction = info.get("icons").get("icon57")
