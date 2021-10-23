@@ -18,7 +18,7 @@ API_key = None
 #Forcing setting file back in to the application folder.
 #This will make sure that I don't leave any junk files over peoples computers. Since there is no unistall button. 
 settings = QtCore.QSettings("setting.ini",QtCore.QSettings.IniFormat) 
-
+print(settings.allKeys())
 
 #Setting window contains setting for the program
 #Here you can chose what tasks will be shown and more. 
@@ -27,29 +27,29 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         super().__init__(parent)
         self.setupUi(self)
         self.buttonBox.accepted.connect(self.save)
-
+        print(settings.value("bills"))
         #Quick fix so None variables don't load, not yet sure how to implement better. 
         #This leads to a bug where when you delete one line from your settin it will reset it.
         #Hope user wont really do that but I would still like it to be working better. 
-        if len(settings.allKeys()) == 15: 
+        #if len(settings.allKeys()) == 15: 
             #Displayed Tasks setting 
-            self.bills.setChecked(bool(settings.value("bills")))
-            self.booster.setChecked(bool(settings.value("booster")))
-            self.busts.setChecked(bool(settings.value("busts")))
-            self.drug.setChecked(bool(settings.value("drug")))
-            self.energy.setChecked(bool(settings.value("energy")))
-            self.energy_refill.setChecked(bool(settings.value("energy_refill")))
-            self.medical.setChecked(bool(settings.value("medical")))
-            self.missions.setChecked(bool(settings.value("missions")))
-            self.nerve.setChecked(bool(settings.value("nerve")))
-            self.npc.setChecked(bool(settings.value("npc")))
-            self.race.setChecked(bool(settings.value("race")))
-            self.rehab.setChecked(bool(settings.value("rehab")))
-            self.wheels.setChecked(bool(settings.value("wheels")))
-            
-            #Advanced Options
+        self.bills.setChecked(int(settings.value("bills")))
+        self.booster.setChecked(int(settings.value("booster")))
+        self.busts.setChecked(int(settings.value("busts")))
+        self.drug.setChecked(int(settings.value("drug")))
+        self.energy.setChecked(int(settings.value("energy")))
+        self.energy_refill.setChecked(int(settings.value("energy_refill")))
+        self.medical.setChecked(int(settings.value("medical")))
+        self.missions.setChecked(int(settings.value("missions")))
+        self.nerve.setChecked(int(settings.value("nerve")))
+        self.npc.setChecked(int(settings.value("npc")))
+        self.race.setChecked(int(settings.value("race")))
+        self.rehab.setChecked(int(settings.value("rehab")))
+        self.wheels.setChecked(int(settings.value("wheels")))
+        
+        #Advanced Options
 
-            self.busts_number.setValue(int(settings.value("busts_number")))
+        self.busts_number.setValue(int(settings.value("busts_number")))
         
         
 
@@ -201,7 +201,8 @@ def update_tasks():
 
 
     #Drug cooldown task
-    if int(info.get("cooldowns").get("drug")) < 60 and bool(settings.value("drug")):
+    drugs = int(info.get("cooldowns").get("drug"))
+    if drugs < 60 and bool(settings.value("drug")):
         tasks.append(Task("Take a drug!",1,ID=1,image=("icons/drugs.png"))) 
 
     #Medical cooldown task
