@@ -11,9 +11,13 @@ from PyQt5 import QtWidgets, uic
 from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon, QPixmap
 
+
 from window import Ui_MainWindow
 
 API_key = None
+
+settings = QtCore.QSettings()
+
 
 
 
@@ -73,10 +77,8 @@ def the_button_was_clicked():
         window.error.show()
         return False
 
-    if setting.get("API_key") != API_key: # if the keys different and the new key is valid save key to file. 
-        with open("setting.json","w") as file:
-            setting["API_key"] = API_key
-            json.dump(setting,file)
+    if settings.value("API_key") != API_key: # if the keys different and the new key is valid save key to file. 
+        settings.setValue("API_key", API_key)
 
 
     window.timer.start(30500) #every 30 second update (new data is shown every 30 seconds so no need to update sooner)
@@ -223,11 +225,9 @@ app = QtWidgets.QApplication(sys.argv) # not sure what it does
 window = MainWindow() #initializing window.py basically 
 window.show() 
 
-with open("setting.json") as json_data: # Loads setting from setting file 
-    setting = json.load(json_data)
 
-if setting.get("API_key") != None : # inserst key in to field if it exists. 
-    window.textEdit.setText(setting.get("API_key"))
+if settings.value("API_key") != None : # inserst key in to field if it exists. 
+    window.textEdit.setText(settings.value("API_key"))
 
 
 app.exec()
