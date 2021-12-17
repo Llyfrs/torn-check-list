@@ -1,0 +1,7 @@
+dist
+icons
+build
+__*
+*.ui
+*.ini
+*.txt

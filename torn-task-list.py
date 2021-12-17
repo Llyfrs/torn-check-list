@@ -197,10 +197,13 @@ def update_tasks():
     time_from_midnight = time.second + time.minute * 60 + time.hour * 3600
     time_day_start = int(timestamp - time_from_midnight)
 
+    print(time_day_start)
 
     info = get_request(f'https://api.torn.com/user/?selections=cooldowns,profile,refills,networth,bars,icons&key={API_key}')
-    count_logs = str(get_request(f'https://api.torn.com/user/?selections=log&log=4200,5360,7815,7810,7805,8370&from={time_day_start}&key={API_key}'))
+    count_logs = str(get_request(f'https://api.torn.com/user/?selections=log&log=4200,5360,7815,7810,7805,8370,6005&from={time_day_start}&key={API_key}'))
     NPC_shop = get_request(f'https://api.torn.com/user/?selections=log&log=4200&from={time_day_start}&key={API_key}')
+    company = get_request(f'https://api.torn.com/company/?selections=employees&key={API_key}')
+    # count_newsletter = str(get_request(f'https://api.torn.com/user/?selections=log&log=400,401&key={API_key}'))
 
 
     #Drug cooldown task
@@ -223,6 +226,14 @@ def update_tasks():
     refills = info.get("refills")
     if not bool(refills.get("energy_refill_used")) and bool(settings.value("energy_refill")):
         tasks.append(Task("Use Your Energy Refill",4,link=link("https://www.torn.com/crimes.php"),ID=2,image="icons/e_refill.png"))
+        
+    #Nerve refill task
+    if not bool(refills.get("nerve_refill_used")) :
+        tasks.append(Task("Use Your Energy Refill",5,ID=2))
+    
+    #Casino refill task
+    if not bool(refills.get("token_refill_used")) :
+            tasks.append(Task("Use Your Casino Tokens Refill",5,ID=2))
 
     #Energy task
     energy = info.get("energy")
@@ -250,8 +261,19 @@ def update_tasks():
         addiction = str(addiction)[(addiction.find("(")+1):addiction.find(")")].strip("-%")
         if int(addiction) >= 3:
             tasks.append(Task("Go to rehab",6,ID=11))
+            
+    #Employee effectiveness
+    addiction = company.get("company_employees").get(str(info.get("player_id"))).get("effectiveness").get("addiction")
+    rehab = count_logs.count("g\': 6005")
+    if addiction < -6 and not rehab:
+        tasks.append(Task("Go to rehab your addiction is {}".format(addiction),6,ID=11))
 
-
+    # #Use newsletter bonus 
+    # newsletters_unused = count_newsletter.count("g\': 400") - count_newsletter.count("g\': 401") 
+    # if newsletters_unused > 0 :
+    #     tasks.append(Task("You have {} unused newsletter bonuses".format(newsletters_unused),10,ID=15))
+    
+    
     #Daily mission task
     missions = count_logs.count("g\': 7815") + count_logs.count("g\': 7810") + count_logs.count("g\': 7805")
     if missions == 0 and bool(settings.value("missions")):
@@ -265,10 +287,9 @@ def update_tasks():
             tasks.append(Task("Do {} more busts".format(busts_number-busts),7,link=link("https://www.torn.com/jailview.php"),ID=7,image="icons/busts.png"))
             pass
     
-    
     #Wheel of Fortune
     spins = count_logs.count("g\': 8370")
-    if spins != 3 and bool(settings.value("wheels")):
+    if spins < 3 and bool(settings.value("wheels")):
         tasks.append(Task("You have {} wheels to be spun".format(3-spins),8,link=link("https://www.torn.com/loader.php?sid=spinTheWheel"),ID=10,image="icons/wheel.png"))
 
     #Buy stuff at NPC shop task
@@ -280,10 +301,10 @@ def update_tasks():
     if brought < 100 and bool(settings.value("npc")):
         tasks.append(Task("Buy {} items at NPC shop".format(100-brought),9,link=link("https://www.torn.com/shops.php?step=bitsnbobs"),ID=8,image="icons/bits_bobs.png"))
 
+    
 
     reorder_task()
     
-
 
 app = QtWidgets.QApplication(sys.argv) # not sure what it does 
 window = MainWindow() #initializing window.py basically 
