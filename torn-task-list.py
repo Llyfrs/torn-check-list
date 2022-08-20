@@ -239,15 +239,15 @@ def update_tasks():
     #Energy refill task
     refills = info.get("refills")
     if not bool(refills.get("energy_refill_used")) and int(settings.value("energy_refill")):
-        tasks.append(Task("Use Your Energy Refill",4,link=link("https://www.torn.com/crimes.php"),ID=2,image="icons/e_refill.png"))
+        tasks.append(Task("Use Your Energy Refill",4,link=link("https://www.torn.com/points.php"),ID=2,image="icons/e_refill.png"))
         
     #Nerve refill task
     if not bool(refills.get("nerve_refill_used")) and int(settings.value("nerve_refill")) :
-        tasks.append(Task("Use Your Energy Refill",5,ID=2))
+        tasks.append(Task("Use Your Energy Refill",5,link=link("https://www.torn.com/points.php"),ID=2))
     
     #Casino refill task
     if not bool(refills.get("token_refill_used")) and int(settings.value("casino_refill")) :
-            tasks.append(Task("Use Your Casino Tokens Refill",5,ID=2))
+            tasks.append(Task("Use Your Casino Tokens Refill",5,link=link("https://www.torn.com/points.php"),ID=2,image="icons/casino.png"))
 
     #Energy task
     energy = info.get("energy")
@@ -267,14 +267,14 @@ def update_tasks():
     #Racing task 
     race = info.get("icons").get("icon17")
     if race == None and int(settings.value("race")):
-        tasks.append(Task("You should enter race",5,link=link("https://www.torn.com/loader.php?sid=racing"),ID=8,image="icons/race.png"))
+        tasks.append(Task("You should enter a race",5,link=link("https://www.torn.com/loader.php?sid=racing"),ID=8,image="icons/race.png"))
 
     #Rehab task
     addiction = info.get("icons").get("icon57")
     if addiction != None and int(settings.value("rehab")):
         addiction = str(addiction)[(addiction.find("(")+1):addiction.find(")")].strip("-%")
         if int(addiction) >= 3:
-            tasks.append(Task("Go to rehab",6,ID=11))
+            tasks.append(Task("Go to rehab",6,ID=11,image="icons/rehab.png"))
             
     #Employee effectiveness
     rehab = count_logs.count("g\': 6005")
@@ -319,7 +319,11 @@ def update_tasks():
         if brought < 100 and int(settings.value("npc")):
             tasks.append(Task("Buy {} items at NPC shop".format(100-brought),9,link=link("https://www.torn.com/shops.php?step=bitsnbobs"),ID=8,image="icons/bits_bobs.png"))
 
-    
+    if int(settings.value("virus")):
+        virus = get_request(f'https://api.torn.com/user/?selections=log&log=5800,5801,5802&key={API_key}')
+        virus = virus.get("log")
+        if virus[next(iter(virus))].get("log") != 5800:
+            tasks.append(Task("Start programming virus",9,ID=10,image="icons/virus.png"))
 
     reorder_task()
     
