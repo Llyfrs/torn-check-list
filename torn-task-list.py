@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from multiprocessing.sharedctypes import Value
 import sys
 import random
 import requests
@@ -16,7 +17,7 @@ from window import Ui_MainWindow
 
 API_key = None
 #Forcing setting file back in to the application folder.
-#This will make sure that I don't leave any junk files over peoples computers. Since there is no unistall button. 
+#This will make sure that I don't leave any junk files over peoples computers. Since there is no uninstall button. 
 settings = QtCore.QSettings("setting.ini",QtCore.QSettings.IniFormat) 
 
 #Setting window contains setting for the program
@@ -29,25 +30,29 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         #Quick fix so None variables don't load, not yet sure how to implement better. 
         #This leads to a bug where when you delete one line from your settin it will reset it.
         #Hope user wont really do that but I would still like it to be working better. 
-        if len(settings.allKeys()) > 13: 
-            #Displayed Tasks setting 
-            self.bills.setChecked(int(settings.value("bills")))
-            self.booster.setChecked(int(settings.value("booster")))
-            self.busts.setChecked(int(settings.value("busts")))
-            self.drug.setChecked(int(settings.value("drug")))
-            self.energy.setChecked(int(settings.value("energy")))
-            self.energy_refill.setChecked(int(settings.value("energy_refill")))
-            self.medical.setChecked(int(settings.value("medical")))
-            self.missions.setChecked(int(settings.value("missions")))
-            self.nerve.setChecked(int(settings.value("nerve")))
-            self.npc.setChecked(int(settings.value("npc")))
-            self.race.setChecked(int(settings.value("race")))
-            self.rehab.setChecked(int(settings.value("rehab")))
-            self.wheels.setChecked(int(settings.value("wheels")))
-        
-            #Advanced Options
+ 
+        #Displayed Tasks setting 
+        self.bills.setChecked(int(settings.value("bills")))
+        self.booster.setChecked(int(settings.value("booster")))
+        self.busts.setChecked(int(settings.value("busts")))
+        self.drug.setChecked(int(settings.value("drug")))
+        self.energy.setChecked(int(settings.value("energy")))
+        self.energy_refill.setChecked(int(settings.value("energy_refill")))
+        self.nerve_refill.setChecked(int(settings.value("nerve_refill")))
+        self.casino_refill.setChecked(int(settings.value("casino_refill")))
+        self.medical.setChecked(int(settings.value("medical")))
+        self.missions.setChecked(int(settings.value("missions")))
+        self.nerve.setChecked(int(settings.value("nerve")))
+        self.npc.setChecked(int(settings.value("npc")))
+        self.race.setChecked(int(settings.value("race")))
+        self.rehab.setChecked(int(settings.value("rehab")))
+        self.wheels.setChecked(int(settings.value("wheels")))
+        self.virus.setChecked(int(settings.value("virus")))
+    
+        #Advanced Options
 
-            self.busts_number.setValue(int(settings.value("busts_number")))
+        self.busts_number.setValue(int(settings.value("busts_number")))
+        self.addiction_amount.setValue(int(settings.value("addiction_amount")))
         
         
 
@@ -59,6 +64,8 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("drug", int(self.drug.isChecked()))
         settings.setValue("energy", int(self.energy.isChecked()))
         settings.setValue("energy_refill", int(self.energy_refill.isChecked()))
+        settings.setValue("nerve_refill", int(self.nerve_refill.isChecked()))
+        settings.setValue("casino_refill", int(self.casino_refill.isChecked()))
         settings.setValue("medical", int(self.medical.isChecked()))
         settings.setValue("missions", int(self.missions.isChecked()))
         settings.setValue("nerve", int(self.nerve.isChecked()))
@@ -66,14 +73,14 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         settings.setValue("race", int(self.race.isChecked()))
         settings.setValue("rehab", int(self.rehab.isChecked()))
         settings.setValue("wheels", int(self.wheels.isChecked()))
+        settings.setValue("virus", int(self.wheels.isChecked()))
         #Advanced Options
         settings.setValue("busts_number", self.busts_number.value())
+        settings.setValue("addiction_amount", self.addiction_amount.value())
         
 
         the_button_was_clicked() #Running this function since it has all necessary checks.
         
-
-
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -94,8 +101,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def generate_save_file(self):
         self.dialog = SettingWindow(self)
         self.dialog.save()
-
-
 
 class Task():
     
@@ -147,9 +152,7 @@ def the_button_was_clicked():
     window.error.hide()
     update_tasks()
 
-
 tasks = list()
-
 
 def reorder_task(): # first actually working pice of code :D Sorts Task based on priority. Should be call every time new task is added. 
     offset = 0
@@ -200,73 +203,86 @@ def update_tasks():
     print(time_day_start)
 
     info = get_request(f'https://api.torn.com/user/?selections=cooldowns,profile,refills,networth,bars,icons&key={API_key}')
-    count_logs = str(get_request(f'https://api.torn.com/user/?selections=log&log=4200,5360,7815,7810,7805,8370,6005&from={time_day_start}&key={API_key}'))
-    NPC_shop = get_request(f'https://api.torn.com/user/?selections=log&log=4200&from={time_day_start}&key={API_key}')
-    company = get_request(f'https://api.torn.com/company/?selections=employees&key={API_key}')
+    count_logs = str(get_request(f'https://api.torn.com/user/?selections=log&log=5360,7815,7810,7805,8370,8371,6005&from={time_day_start}&key={API_key}'))
+    ## Used log IDs 
+    # 5360 - Bust success
+    # 7815 - Missions complete
+    # 7810 - Missions fail
+    # 7805 - Missions decline
+    # 8370 - Casino spin the wheel start
+    # 8371 - Casino spin the wheel free spin
+    # 6005 - Rehab 
+    
+    ## Notes 
+    ## NPC_shop should be skipped automatically when is completed. 
+
+ 
     # count_newsletter = str(get_request(f'https://api.torn.com/user/?selections=log&log=400,401&key={API_key}'))
 
 
     #Drug cooldown task
     drugs = int(info.get("cooldowns").get("drug"))
-    if drugs < 60 and bool(settings.value("drug")):
+    if drugs < 60 and int(settings.value("drug")):
         tasks.append(Task("Take a drug!",1,ID=1,image=("icons/drugs.png"))) 
 
     #Medical cooldown task
     medical = int(info.get("cooldowns").get("medical"))
     life = (float(info.get("life").get("current"))/float(info.get("life").get("maximum")))*100
-    if medical < 14400 and life > 90 and bool(settings.value("medical")): #set up that you get task only if you can fill 3 blood packs
+    if medical < 14400 and life > 90 and int(settings.value("medical")): #set up that you get task only if you can fill 3 blood packs
         tasks.append(Task("Fill a Blood Bag",5,ID=1,image=str("icons/medical.png")))
 
     #Bosster cooldown task
     booster = int(info.get("cooldowns").get("booster"))
-    if booster < 28800 and bool(settings.value("booster")):
+    if booster < 28800 and int(settings.value("booster")):
         tasks.append(Task("Go Drink some Beer",4,ID=1,image="icons/booster.png"))
     
     #Energy refill task
     refills = info.get("refills")
-    if not bool(refills.get("energy_refill_used")) and bool(settings.value("energy_refill")):
+    if not bool(refills.get("energy_refill_used")) and int(settings.value("energy_refill")):
         tasks.append(Task("Use Your Energy Refill",4,link=link("https://www.torn.com/crimes.php"),ID=2,image="icons/e_refill.png"))
         
     #Nerve refill task
-    if not bool(refills.get("nerve_refill_used")) :
+    if not bool(refills.get("nerve_refill_used")) and int(settings.value("nerve_refill")) :
         tasks.append(Task("Use Your Energy Refill",5,ID=2))
     
     #Casino refill task
-    if not bool(refills.get("token_refill_used")) :
+    if not bool(refills.get("token_refill_used")) and int(settings.value("casino_refill")) :
             tasks.append(Task("Use Your Casino Tokens Refill",5,ID=2))
 
     #Energy task
     energy = info.get("energy")
-    if int(energy.get("current"))==int(energy.get("maximum")) and bool(settings.value("energy")):
+    if int(energy.get("current"))==int(energy.get("maximum")) and int(settings.value("energy")):
         tasks.append(Task("Spend your Energy on something",2,ID=3,image="icons/energy.png"))
 
     #Crime task
     nerve = info.get("nerve")
-    if int(nerve.get("current")) >= int(nerve.get("maximum")) and bool(settings.value("nerve")):
+    if int(nerve.get("current")) >= int(nerve.get("maximum")) and int(settings.value("nerve")):
         tasks.append(Task("Go Commit some Crimes",2,link=link("https://www.torn.com/crimes.php"),ID=3,image="icons/crimes.png"))
 
     #Unpaidfees task
     unpaidfees = int(info.get("networth").get("unpaidfees"))
-    if unpaidfees != 0 and bool(settings.value("bills")):
+    if unpaidfees != 0 and int(settings.value("bills")):
         tasks.append(Task("You have -${:,} unpaidfees".format(-1*unpaidfees),6,link("https://www.torn.com/loan.php"),ID=5,image="icons/fees.png"))
 
     #Racing task 
     race = info.get("icons").get("icon17")
-    if race == None and bool(settings.value("race")):
+    if race == None and int(settings.value("race")):
         tasks.append(Task("You should enter race",5,link=link("https://www.torn.com/loader.php?sid=racing"),ID=8,image="icons/race.png"))
 
     #Rehab task
     addiction = info.get("icons").get("icon57")
-    if addiction != None and bool(settings.value("rehab")):
+    if addiction != None and int(settings.value("rehab")):
         addiction = str(addiction)[(addiction.find("(")+1):addiction.find(")")].strip("-%")
         if int(addiction) >= 3:
             tasks.append(Task("Go to rehab",6,ID=11))
             
     #Employee effectiveness
-    addiction = company.get("company_employees").get(str(info.get("player_id"))).get("effectiveness").get("addiction")
     rehab = count_logs.count("g\': 6005")
-    if addiction < -6 and not rehab:
-        tasks.append(Task("Go to rehab your addiction is {}".format(addiction),6,ID=11))
+    if not rehab and int(settings.value("rehab")):      
+        company = get_request(f'https://api.torn.com/company/?selections=employees&key={API_key}')
+        addiction = company.get("company_employees").get(str(info.get("player_id"))).get("effectiveness").get("addiction")
+        if addiction <= int(settings.value("addiction_amount")) * -1 and not rehab:
+            tasks.append(Task("Go to rehab your addiction is {}".format(addiction),6,ID=11))
 
     # #Use newsletter bonus 
     # newsletters_unused = count_newsletter.count("g\': 400") - count_newsletter.count("g\': 401") 
@@ -276,30 +292,32 @@ def update_tasks():
     
     #Daily mission task
     missions = count_logs.count("g\': 7815") + count_logs.count("g\': 7810") + count_logs.count("g\': 7805")
-    if missions == 0 and bool(settings.value("missions")):
+    if missions == 0 and int(settings.value("missions")):
         tasks.append(Task("Complete your daily mission",9,ID=6,image="icons/mission.png"))
     
     #Bust people task
     if settings.value("busts_number")!= None: #Just in case value doesn't exists in setting. 
         busts = count_logs.count("g\': 5360") 
         busts_number = int(settings.value("busts_number"))
-        if   busts < busts_number  and bool(settings.value("busts")):
+        if   busts < busts_number  and int(settings.value("busts")):
             tasks.append(Task("Do {} more busts".format(busts_number-busts),7,link=link("https://www.torn.com/jailview.php"),ID=7,image="icons/busts.png"))
             pass
     
     #Wheel of Fortune
-    spins = count_logs.count("g\': 8370")
-    if spins < 3 and bool(settings.value("wheels")):
+    spins = count_logs.count("g\': 8370") - count_logs.count("g\': 8371")
+    if spins < 3 and int(settings.value("wheels")):
         tasks.append(Task("You have {} wheels to be spun".format(3-spins),8,link=link("https://www.torn.com/loader.php?sid=spinTheWheel"),ID=10,image="icons/wheel.png"))
 
     #Buy stuff at NPC shop task
-    NPC_shop = NPC_shop.get("log")
-    brought = 0
-    if NPC_shop != None:
-        for log in NPC_shop:
-            brought += int(NPC_shop.get(log).get("data").get("quantity"))
-    if brought < 100 and bool(settings.value("npc")):
-        tasks.append(Task("Buy {} items at NPC shop".format(100-brought),9,link=link("https://www.torn.com/shops.php?step=bitsnbobs"),ID=8,image="icons/bits_bobs.png"))
+    if int(settings.value("npc")):
+        NPC_shop = get_request(f'https://api.torn.com/user/?selections=log&log=4200&from={time_day_start}&key={API_key}')
+        NPC_shop = NPC_shop.get("log")
+        brought = 0
+        if NPC_shop != None:
+            for log in NPC_shop:
+                brought += int(NPC_shop.get(log).get("data").get("quantity"))
+        if brought < 100 and int(settings.value("npc")):
+            tasks.append(Task("Buy {} items at NPC shop".format(100-brought),9,link=link("https://www.torn.com/shops.php?step=bitsnbobs"),ID=8,image="icons/bits_bobs.png"))
 
     
 
@@ -311,7 +329,7 @@ window = MainWindow() #initializing window.py basically
 window.show() 
 
 
-if len(settings.allKeys()) == 0: #Checks if setting file exists if no forces window to generate new one. 
+if len(settings.allKeys()) != 19: #Checks if setting file exists if no forces window to generate new one. 
     window.generate_save_file()
 
 
