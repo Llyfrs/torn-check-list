@@ -1,0 +1,1 @@
+for f in qt/*.ui ; do pyuic5 "$f" -o "py/$(basename "$f" .ui).py"; done
