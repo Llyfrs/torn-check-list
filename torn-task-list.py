@@ -23,63 +23,29 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         super().__init__(parent)
         self.setupUi(self)
         self.buttonBox.accepted.connect(self.save)
-        # Quick fix so None variables don't load, not yet sure how to implement better.
-        # This leads to a bug where when you delete one line from your setting it will reset it.
-        # Hope user won't really do that, but I would still like it to work better.
 
         # Displayed Tasks setting
-        if len(settings.allKeys()) == 19:
 
-            for child in self.findChildren(QtWidgets.QCheckBox):  # type: QtWidgets.QCheckBox
-                # assert isinstance(child, QtWidgets.QCheckBox)
-                child.setChecked(bool(settings.value(child.objectName())))
+        # Sets all checkboxes, needs to be parsed to int because it returns string and bool parser always give true
+        for child in self.findChildren(QtWidgets.QCheckBox):  # type: QtWidgets.QCheckBox
+            # assert isinstance(child, QtWidgets.QCheckBox)
+            child.setChecked(int(settings.value(child.objectName())))
 
-            # Advanced Options
-            self.busts_number.setValue(int(settings.value("busts_number")))
-            self.addiction_amount.setValue(int(settings.value("addiction_amount")))
-
-            """
-            self.bills.setChecked(int(settings.value("bills")))
-            self.booster.setChecked(int(settings.value("booster")))
-            self.busts.setChecked(int(settings.value("busts")))
-            self.drug.setChecked(int(settings.value("drug")))
-            self.energy.setChecked(int(settings.value("energy")))
-            self.energy_refill.setChecked(int(settings.value("energy_refill")))
-            self.nerve_refill.setChecked(int(settings.value("nerve_refill")))
-            self.casino_refill.setChecked(int(settings.value("casino_refill")))
-            self.medical.setChecked(int(settings.value("medical")))
-            self.missions.setChecked(int(settings.value("missions")))
-            self.nerve.setChecked(int(settings.value("nerve")))
-            self.npc.setChecked(int(settings.value("npc")))
-            self.race.setChecked(int(settings.value("race")))
-            self.rehab.setChecked(int(settings.value("rehab")))
-            self.wheels.setChecked(int(settings.value("wheels")))
-            self.virus.setChecked(int(settings.value("virus")))
-            """
+        # Advanced Options
+        self.busts_number.setValue(int(settings.value("busts_number")))
+        self.addiction_amount.setValue(int(settings.value("addiction_amount")))
 
     def save(self):  # Saves check box states in to a setting.ini
-        # Displayed Tasks setting
-        settings.setValue("bills", int(self.bills.isChecked()))
-        settings.setValue("booster", int(self.booster.isChecked()))
-        settings.setValue("busts", int(self.busts.isChecked()))
-        settings.setValue("drug", int(self.drug.isChecked()))
-        settings.setValue("energy", int(self.energy.isChecked()))
-        settings.setValue("energy_refill", int(self.energy_refill.isChecked()))
-        settings.setValue("nerve_refill", int(self.nerve_refill.isChecked()))
-        settings.setValue("casino_refill", int(self.casino_refill.isChecked()))
-        settings.setValue("medical", int(self.medical.isChecked()))
-        settings.setValue("missions", int(self.missions.isChecked()))
-        settings.setValue("nerve", int(self.nerve.isChecked()))
-        settings.setValue("npc", int(self.npc.isChecked()))
-        settings.setValue("race", int(self.race.isChecked()))
-        settings.setValue("rehab", int(self.rehab.isChecked()))
-        settings.setValue("wheels", int(self.wheels.isChecked()))
-        settings.setValue("virus", int(self.wheels.isChecked()))
+
+        for child in self.findChildren(QtWidgets.QCheckBox):  # type: QtWidgets.QCheckBox
+            # assert isinstance(child, QtWidgets.QCheckBox)
+            settings.setValue(child.objectName(), int(child.isChecked()))
+
         # Advanced Options
         settings.setValue("busts_number", self.busts_number.value())
         settings.setValue("addiction_amount", self.addiction_amount.value())
 
-        the_button_was_clicked()  # Running this function since it has all necessary checks.
+        the_button_was_clicked()  # Force Updates the list so the new setting is applied
 
 
 class TaskBox(QtWidgets.QFrame, Ui_frame):
@@ -101,12 +67,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.error.hide()
 
     def open_setting(self):
-        self.dialog = SettingWindow(self)
-        self.dialog.open()
+        dialog = SettingWindow(self)
+        dialog.open()
 
     def generate_save_file(self):
-        self.dialog = SettingWindow(self)
-        self.dialog.save()
+        dialog = SettingWindow(self)
+        dialog.save()
 
 
 class Task():
