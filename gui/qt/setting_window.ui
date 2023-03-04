@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>348</width>
-    <height>625</height>
+    <height>636</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>580</y>
+     <y>600</y>
      <width>131</width>
      <height>24</height>
     </rect>
@@ -52,9 +52,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>0</y>
      <width>131</width>
-     <height>16</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -70,9 +70,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>480</y>
+     <y>490</y>
      <width>151</width>
-     <height>16</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -88,7 +88,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>490</y>
+     <y>510</y>
      <width>341</width>
      <height>16</height>
     </rect>
@@ -101,7 +101,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>510</y>
+     <y>530</y>
      <width>43</width>
      <height>24</height>
     </rect>
@@ -117,7 +117,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>510</y>
+     <y>530</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -132,7 +132,7 @@
      <x>6</x>
      <y>40</y>
      <width>321</width>
-     <height>441</height>
+     <height>451</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -302,7 +302,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>540</y>
+     <y>560</y>
      <width>43</width>
      <height>24</height>
     </rect>
@@ -318,7 +318,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>540</y>
+     <y>560</y>
      <width>211</width>
      <height>21</height>
     </rect>

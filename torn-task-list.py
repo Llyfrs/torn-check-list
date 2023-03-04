@@ -29,6 +29,16 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
 
         # Displayed Tasks setting
         if len(settings.allKeys()) == 19:
+
+            for child in self.findChildren(QtWidgets.QCheckBox):  # type: QtWidgets.QCheckBox
+                # assert isinstance(child, QtWidgets.QCheckBox)
+                child.setChecked(bool(settings.value(child.objectName())))
+
+            # Advanced Options
+            self.busts_number.setValue(int(settings.value("busts_number")))
+            self.addiction_amount.setValue(int(settings.value("addiction_amount")))
+
+            """
             self.bills.setChecked(int(settings.value("bills")))
             self.booster.setChecked(int(settings.value("booster")))
             self.busts.setChecked(int(settings.value("busts")))
@@ -45,10 +55,7 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
             self.rehab.setChecked(int(settings.value("rehab")))
             self.wheels.setChecked(int(settings.value("wheels")))
             self.virus.setChecked(int(settings.value("virus")))
-            # Advanced Options
-
-            self.busts_number.setValue(int(settings.value("busts_number")))
-            self.addiction_amount.setValue(int(settings.value("addiction_amount")))
+            """
 
     def save(self):  # Saves check box states in to a setting.ini
         # Displayed Tasks setting
@@ -79,8 +86,6 @@ class TaskBox(QtWidgets.QFrame, Ui_frame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        print("Init")
-
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -109,28 +114,25 @@ class Task():
     ID = 0
 
     def __init__(self, task_name, priority=0, link="link", image="icons/missing_icon.png", ID=0):
+        self.frame = TaskBox(window)
 
-        print("TaksInit")
+        self.frame.task_name.setText(task_name)
+        self.frame.icon.setAutoFillBackground(False)
+        self.frame.icon.setGeometry(window.label_4.geometry())
+        self.frame.icon.setPixmap(QPixmap(image).scaled(self.frame.icon.size()))
 
-        self.newframe = TaskBox(window)
+        self.frame.link.setText(link)
+        self.frame.link.setOpenExternalLinks(True)
 
-        self.newframe.task_name.setText(task_name)
-        self.newframe.icon.setAutoFillBackground(False)
-        self.newframe.icon.setGeometry(window.label_4.geometry())
-        self.newframe.icon.setPixmap(QPixmap(image).scaled(self.newframe.icon.size()))
-
-        self.newframe.link.setText(link)
-        self.newframe.link.setOpenExternalLinks(True)
-
-        self.newframe.show()
+        self.frame.show()
         self.ID = ID
         self.priority = priority
 
     def __del__(self):
-        self.newframe.deleteLater()
+        self.frame.deleteLater()
 
     def move(self, position):
-        self.newframe.move(self.newframe.x(), window.frame.y() + position * window.frame.height())
+        self.frame.move(10, 60 + position * self.frame.height())
 
 
 def the_button_was_clicked():
@@ -146,7 +148,7 @@ def the_button_was_clicked():
     if settings.value("API_key") != API_key:  # if the keys different and the new key is valid save key to file.
         settings.setValue("API_key", API_key)
 
-    window.timer.start(30500)  # every 30 second update (new data is shown every 30 seconds so no need to update sooner)
+    window.timer.start(30500)  # every 30-second update (new data is shown every 30 seconds so no need to update sooner)
     window.error.hide()
     update_tasks()
 
