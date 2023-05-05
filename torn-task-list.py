@@ -73,7 +73,7 @@ class CustomTask(QtWidgets.QFrame, Ui_CustomTask):
         self.comboBox_4.setInsertPolicy(QtWidgets.QComboBox.NoInsert)
         self.comboBox_4.completer().setCompletionMode(QtWidgets.QCompleter.PopupCompletion)
 
-        self.comboBox_3.addItems(["increased by", "decreased by"])
+        self.comboBox_3.addItems(["increased by"])
 
 
 class CustomWindow(QtWidgets.QDialog, Ui_Custom):
@@ -258,7 +258,7 @@ def get_stats(time_start=None):
         for stat in batch:
             url += stat.get("stat") + ","
 
-        if time_start is None:
+        if time_start is not None:
             url += "&timestamp=" + str(time_start)
 
         url += "&key=" + settings.value("API_key")
@@ -274,7 +274,11 @@ def get_stats(time_start=None):
     return data
 
 
+old_data = None
+
+
 def update_tasks():
+    global old_data
     tasks.clear()
     print("Updating")
 
@@ -289,11 +293,12 @@ def update_tasks():
     count_logs = str(get_request(
         f'https://api.torn.com/user/?selections=log&log=5360,7815,7810,7805,8370,8371,6005&from={time_day_start}&key={API_key}'))
 
-    old_data = get_stats(time_day_start)
+    if old_data is None:
+        old_data = get_stats(time_day_start)
+
     new_data = get_stats()
 
     print(old_data)
-
     print(new_data)
 
     # -Used log IDs
@@ -430,6 +435,16 @@ def update_tasks():
         virus = virus.get("log")
         if virus[next(iter(virus))].get("log") != 5800:
             tasks.append(Task("Start programming virus", 9, ID=10, image="icons/virus.png"))
+
+    for stat in settings.value("customs"):
+        key = stat.get("stat")
+
+        value = stat.get("value", 0) - (new_data[key] - old_data[key])
+
+        if value > 0:
+            description = str(stat.get("description")).replace("${value}", str(value))
+            tasks.append(Task(description, 9, image="icons/note.png"))
+
 
     reorder_task()
 
