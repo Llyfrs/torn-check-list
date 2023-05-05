@@ -43,15 +43,22 @@ Right now the app updates every 30 seconds making 3 API calls.
 - Reminder to do crimes 
 - Reminder to pay your fees
 - Reminder to go racing 
-- Reminder to go to rehab 
+- Reminder to got to rehab based on your company addiction.
 - Reminder to do your daily mission 
 - Reminder to bust people from jai
 - Reminder to spin wheel of fortune
 - Reminder to go buy stuff from NPC shop
+- Reminder to code computer virus
 
-## Donwoald
+# Custom tasks
 
-[torn-check-list-v1.1.0-linux.tar.xz](https://github.com/Llyfrs/torn-check-list/releases/download/v1.1.0/torn-check-list-v1.1.0-linux.tar.xz) 
+In the options you can find a menu option that will open a new window allowing you to create and manage 
+your own custom tasks. This allows you to set up a daily goal for any statistic found on the personal stats page.
+You can find names for all of them in icons/statistics.txt but that won't be necessary since the combination box also 
+allows you to browse all the available statistics to chose from. 
 
-[torn-check-list-v1.1.0-windows.zip](https://github.com/Llyfrs/torn-check-list/releases/download/v1.1.0/torn-check-list-v1.1.0-windows.zip)
+After you chose what statistic you want to track, you also need to choose by how much that statistic should increase
+that day. You can use the key word `${value}` to input in to the title, how much off currents task is remaining.
 
+
+![image](https://i.imgur.com/LSLBJUG.png)

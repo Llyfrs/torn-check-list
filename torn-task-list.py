@@ -39,11 +39,11 @@ class SettingWindow(QtWidgets.QDialog, Ui_Dialog):
         # Sets all checkboxes, needs to be parsed to int because it returns string and bool parser always give true
         for child in self.findChildren(QtWidgets.QCheckBox):  # type: QtWidgets.QCheckBox
             # assert isinstance(child, QtWidgets.QCheckBox)
-            child.setChecked(settings.value(child.objectName(), type=bool))
+            child.setChecked(settings.value(child.objectName(), type=bool, defaultValue=1))
 
         # Advanced Options
-        self.busts_number.setValue(settings.value("busts_number", type=int))
-        self.addiction_amount.setValue(settings.value("addiction_amount", type=int))
+        self.busts_number.setValue(settings.value("busts_number", type=int, defaultValue=3))
+        self.addiction_amount.setValue(settings.value("addiction_amount", type=int, defaultValue=10))
 
     def save(self):  # Saves check box states in to a setting.ini
 
@@ -161,13 +161,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.verticalLayout_2.setAlignment(Qt.AlignTop)
 
+
+    # The timer needs to be stop so the UI doesn't freez on the user
     def open_setting(self):
         dialog = SettingWindow(self)
+        self.timer.stop()
         dialog.open()
+        the_button_was_clicked()
 
     def open_custome(self):
         dialog = CustomWindow(self)
+        self.timer.stop()
         dialog.open()
+        the_button_was_clicked()
         pass
 
     def generate_save_file(self):
@@ -221,8 +227,8 @@ def the_button_was_clicked():
 
 tasks = list()
 
-
-def reorder_task():  # Sorts Task based on priority. Should be called every time new task list is updated.
+# Sorts Task based on priority. Should be called every time new task list is updated.
+def reorder_task():
     offset = 0
     for i in range(10):
         for task in tasks:
@@ -248,6 +254,7 @@ def link(url):
     return "<a href=\"{0}\"><span style=\" text-decoration: underline; color:#0000ff;\">Visit</span></a>".format(url)
 
 
+# gets either statistics from timestamp, or the current ones, if time is not provided
 def get_stats(time_start=None):
     statistics = settings.value("customs", [], list)
     statistics = [statistics[i:i + 10] for i in range(0, len(statistics), 10)]
@@ -263,20 +270,16 @@ def get_stats(time_start=None):
 
         url += "&key=" + settings.value("API_key")
 
-        print(url)
-
         temp = dict(get_request(url).get("personalstats"))
         data.update(temp)
         # Even thou correctly cashing shouldn't get triggerd with different request, it seems it still happens if the
-        # requests are close to gather.
+        # requests are close together.
         time.sleep(1)
 
     return data
 
 
 old_data = None
-
-
 def update_tasks():
     global old_data
     tasks.clear()
@@ -297,9 +300,6 @@ def update_tasks():
         old_data = get_stats(time_day_start)
 
     new_data = get_stats()
-
-    print(old_data)
-    print(new_data)
 
     # -Used log IDs
     # 5360 - Bust success                       # Can be rewritten to use stats
@@ -379,6 +379,9 @@ def update_tasks():
             tasks.append(Task("Go to rehab", 6, ID=11, image="icons/rehab.png"))
 
     # Employee effectiveness
+    # If player already rehab that day, don't show
+    # We have to do this since addiction only updates once a day,
+    # So the task would stay there long after the player already rehabbed
     rehab = count_logs.count("g\': 6005")
     if not rehab and int(settings.value("rehab")):
         company = get_request(f'https://api.torn.com/company/?selections=employees&key={API_key}')
@@ -436,15 +439,14 @@ def update_tasks():
         if virus[next(iter(virus))].get("log") != 5800:
             tasks.append(Task("Start programming virus", 9, ID=10, image="icons/virus.png"))
 
-    for stat in settings.value("customs"):
+    for stat in settings.value("customs", defaultValue=[]):
         key = stat.get("stat")
 
         value = stat.get("value", 0) - (new_data[key] - old_data[key])
 
         if value > 0:
             description = str(stat.get("description")).replace("${value}", str(value))
-            tasks.append(Task(description, 9, image="icons/note.png"))
-
+            tasks.append(Task(description, 9, image="icons/note.png", link=link("https://www.torn.com/index.php")))
 
     reorder_task()
 
