@@ -15,6 +15,13 @@ class Ui_frame(object):
     def setupUi(self, frame):
         frame.setObjectName("frame")
         frame.resize(341, 41)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(frame.sizePolicy().hasHeightForWidth())
+        frame.setSizePolicy(sizePolicy)
+        frame.setMinimumSize(QtCore.QSize(341, 41))
+        frame.setBaseSize(QtCore.QSize(41, 0))
         frame.setFrameShape(QtWidgets.QFrame.Box)
         frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.icon = QtWidgets.QLabel(frame)
